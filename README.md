@@ -255,25 +255,8 @@ yarn test:coverage
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Configure environment variables
-4. Deploy automatically
+Deployed Link : https://scholarsync-resume-integration.onrender.com/
 
-### Manual Deployment
-```bash
-npm run build
-npm run start
-```
-
-### Environment Variables for Production
-```env
-NEXT_PUBLIC_APP_URL=https://your-domain.com
-UPLOAD_MAX_SIZE=5242880
-RATE_LIMIT_MAX=100
-RATE_LIMIT_WINDOW=900000
-```
 
 ## 📝 Development Scripts
 
