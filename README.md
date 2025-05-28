@@ -306,29 +306,7 @@ npm run test:watch   # Run tests in watch mode
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
 
-- Next.js team for the amazing framework
-- Redux Toolkit for simplified state management
-- Tailwind CSS for utility-first styling
-- Open source community for various libraries used
 
-## 📞 Support
-
-For support and questions:
-- Create an issue on GitHub
-- Email: hello@researchcommons.ai
-- Documentation: [Project Wiki](https://github.com/your-username/scholarsync-resume-integration/wiki)
-
-## 🔗 Links
-
-- **Live Demo**: [https://your-app.vercel.app](https://your-app.vercel.app)
-- **GitHub Repository**: [https://github.com/your-username/scholarsync-resume-integration-your-name](https://github.com/your-username/scholarsync-resume-integration-your-name)
-- **Documentation**: [Project Wiki](https://github.com/your-username/scholarsync-resume-integration/wiki)
-
----
-
-**Built with ❤️ using Next.js, Redux, and Tailwind CSS**
-```
 
 This comprehensive README.md file covers all the essential aspects of your ScholarSync Resume Integration project, including setup instructions, usage guidelines, API documentation, testing procedures, security measures, and deployment information. It's structured to be both informative for users and helpful for developers who want to contribute to the project.
