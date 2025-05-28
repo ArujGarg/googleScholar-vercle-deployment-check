@@ -142,8 +142,9 @@ export async function POST(request) {
   } catch (error) {
     console.error("Scholar profile API error:", error)
     return NextResponse.json(
-      { error: "Failed to fetch Google Scholar profile. Please check the URL and try again." },
+      { error: "Can not Google Scholar profile. Please check the URL and try again." },
       { status: 500 },
     )
   }
 }
+
