@@ -95,7 +95,7 @@ scholarsync-resume-integration/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/scholarsync-resume-integration-your-name.git
+   git clone https://github.com/your-username/scholarsync-resume-integration-adarshSingh.git
    cd scholarsync-resume-integration-your-name
    ```
 
