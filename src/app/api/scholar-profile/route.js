@@ -1,32 +1,32 @@
-import { NextResponse } from "next/server"
-import * as cheerio from "cheerio"
+import { NextResponse } from "next/server";
+import * as cheerio from "cheerio";
 
 // Rate limiting store (in production, use Redis or database)
-const rateLimitStore = new Map()
+const rateLimitStore = new Map();
 
 function checkRateLimit(ip) {
-  const now = Date.now()
-  const windowMs = 60 * 1000 // 1 minute
-  const maxRequests = 10
+  const now = Date.now();
+  const windowMs = 60 * 1000; // 1 minute
+  const maxRequests = 10;
 
   if (!rateLimitStore.has(ip)) {
-    rateLimitStore.set(ip, { count: 1, resetTime: now + windowMs })
-    return true
+    rateLimitStore.set(ip, { count: 1, resetTime: now + windowMs });
+    return true;
   }
 
-  const record = rateLimitStore.get(ip)
+  const record = rateLimitStore.get(ip);
   if (now > record.resetTime) {
-    record.count = 1
-    record.resetTime = now + windowMs
-    return true
+    record.count = 1;
+    record.resetTime = now + windowMs;
+    return true;
   }
 
   if (record.count >= maxRequests) {
-    return false
+    return false;
   }
 
-  record.count++
-  return true
+  record.count++;
+  return true;
 }
 
 function sanitizeInput(input) {
@@ -34,7 +34,7 @@ function sanitizeInput(input) {
   return input
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
     .replace(/javascript:/gi, "")
-    .replace(/on\w+\s*=/gi, "")
+    .replace(/on\w+\s*=/gi, "");
 }
 
 async function scrapeScholarProfile(profileUrl) {
@@ -45,14 +45,16 @@ async function scrapeScholarProfile(profileUrl) {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
       },
-    })
+    });
+
+    console.log("response", response);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const html = await response.text()
-    const $ = cheerio.load(html)
+    const html = await response.text();
+    const $ = cheerio.load(html);
 
     const profileData = {
       name: "",
@@ -61,37 +63,37 @@ async function scrapeScholarProfile(profileUrl) {
       hIndex: 0,
       researchInterests: [],
       publications: [],
-    }
+    };
 
     // Extract name
-    profileData.name = $("#gsc_prf_in").text().trim()
+    profileData.name = $("#gsc_prf_in").text().trim();
 
     // Extract affiliation
-    profileData.affiliation = $(".gsc_prf_il").first().text().trim()
+    profileData.affiliation = $(".gsc_prf_il").first().text().trim();
 
     // Extract research interests
     $(".gsc_prf_int").each((i, elem) => {
-      const interest = $(elem).text().trim()
+      const interest = $(elem).text().trim();
       if (interest) {
-        profileData.researchInterests.push(interest)
+        profileData.researchInterests.push(interest);
       }
-    })
+    });
 
     // Extract citation metrics
     $(".gsc_rsb_std").each((i, elem) => {
-      const value = Number.parseInt($(elem).text().replace(/,/g, "")) || 0
-      if (i === 0) profileData.totalCitations = value
-      if (i === 2) profileData.hIndex = value
-    })
+      const value = Number.parseInt($(elem).text().replace(/,/g, "")) || 0;
+      if (i === 0) profileData.totalCitations = value;
+      if (i === 2) profileData.hIndex = value;
+    });
 
     // Extract publications
     $(".gsc_a_tr").each((i, elem) => {
       if (i < 10) {
         // Limit to first 10 publications
-        const title = $(elem).find(".gsc_a_at").text().trim()
-        const authors = $(elem).find(".gsc_a_at").next().text().trim()
-        const year = $(elem).find(".gsc_a_y").text().trim()
-        const citations = Number.parseInt($(elem).find(".gsc_a_c").text()) || 0
+        const title = $(elem).find(".gsc_a_at").text().trim();
+        const authors = $(elem).find(".gsc_a_at").next().text().trim();
+        const year = $(elem).find(".gsc_a_y").text().trim();
+        const citations = Number.parseInt($(elem).find(".gsc_a_c").text()) || 0;
 
         if (title) {
           profileData.publications.push({
@@ -99,52 +101,63 @@ async function scrapeScholarProfile(profileUrl) {
             authors,
             year,
             citations,
-          })
+          });
         }
       }
-    })
+    });
 
-    return profileData
+    return profileData;
   } catch (error) {
-    console.error("Scholar scraping error:", error)
-    throw new Error("Failed to fetch Google Scholar profile")
+    console.error("Scholar scraping error:", error);
+    throw new Error("Failed to fetch Google Scholar profile");
   }
 }
 
 export async function POST(request) {
   try {
     // Get client IP for rate limiting
-    const forwarded = request.headers.get("x-forwarded-for")
-    const ip = forwarded ? forwarded.split(",")[0] : "unknown"
+    const forwarded = request.headers.get("x-forwarded-for");
+    const ip = forwarded ? forwarded.split(",")[0] : "unknown";
 
     // Check rate limit
     if (!checkRateLimit(ip)) {
-      return NextResponse.json({ error: "Rate limit exceeded. Please try again later." }, { status: 429 })
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please try again later." },
+        { status: 429 }
+      );
     }
 
-    const { profileUrl } = await request.json()
+    const { profileUrl } = await request.json();
 
     if (!profileUrl) {
-      return NextResponse.json({ error: "Profile URL is required" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Profile URL is required" },
+        { status: 400 }
+      );
     }
 
     // Sanitize input
-    const sanitizedUrl = sanitizeInput(profileUrl)
+    const sanitizedUrl = sanitizeInput(profileUrl);
 
     // Validate URL
     if (!sanitizedUrl.includes("scholar.google.com")) {
-      return NextResponse.json({ error: "Invalid Google Scholar URL" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Invalid Google Scholar URL" },
+        { status: 400 }
+      );
     }
 
-    const profileData = await scrapeScholarProfile(sanitizedUrl)
+    const profileData = await scrapeScholarProfile(sanitizedUrl);
 
-    return NextResponse.json(profileData)
+    return NextResponse.json(profileData);
   } catch (error) {
-    console.error("Scholar profile API error:", error)
+    console.error("Scholar profile API error:", error);
     return NextResponse.json(
-      { error: "Can not Google Scholar profile. Please check the URL and try again." },
-      { status: 500 },
-    )
+      {
+        error:
+          "Can not Google Scholar profile. Please check the URL and try again.",
+      },
+      { status: 500 }
+    );
   }
 }
-
